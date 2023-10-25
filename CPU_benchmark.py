@@ -1,7 +1,16 @@
+#TODO
+"""
+Fix 'multi threaded tests' label (now appears twice)
+Add plots for multi and single threaded tests by specific key
+Add one more algorithm for multi tests
+
+"""
+
 import argparse
 import textwrap
 import time
 import math
+import subprocess
 
 
 class CPUBenchmark:
@@ -18,15 +27,16 @@ class CPUBenchmark:
     def single_threaded_performance_benchmarks(self):
         print("Factorization tests are running now!")
         result_test1 = self.factorization_single_thread(duration_to_run=self.std_duration)
-        print("Matrices multiplication tests are running now!")
-        result_test2 = self.matrix_multiplication_single_thread(duration_to_run=self.std_duration)
         print("Pi calculation tests are running now!")
-        result_test3 = self.pi_calculation(duration_to_run=self.std_duration)
+        result_test2 = self.pi_calculation(duration_to_run=self.std_duration)
+        print("\nMatrices multiplication tests are running now!")
+        result_test3 = self.matrix_multiplication_single_thread(duration_to_run=self.std_duration)
 
         self.results['single_threaded_performance'] = {
             'factorization_benchmark_test': result_test1,
-            'matrix_multiplication_benchmark_test': result_test2,
-            'pi_calculation_benchmark_test': result_test3
+            'pi_calculation_benchmark_test': result_test2,
+            'matrix_multiplication_benchmark_test': result_test3
+
         }
 
     def multi_threaded_performance_benchmarks(self):
@@ -44,10 +54,11 @@ class CPUBenchmark:
         if keys.t_std is not None:
             self.std_duration = keys.t_std
         if not keys.no_std:
-            if keys.n_std >= 1:
-                for _ in range(keys.n_std):
-                    print(f"\n---SINGLE THREADED TESTS ({_+1})---\n")
-                    self.single_threaded_performance_benchmarks()
+            if keys.n_std is not None:
+                if keys.n_std > 1:
+                    for _ in range(keys.n_std):
+                        print(f"\n---SINGLE THREADED TESTS ({_+1})---\n")
+                        self.single_threaded_performance_benchmarks()
             else:
                 print("\n---SINGLE THREADED TESTS---\n")
                 self.single_threaded_performance_benchmarks()
@@ -56,10 +67,11 @@ class CPUBenchmark:
         if keys.t_mtd is not None:
             self.mtd_duration = keys.t_mtd
         if not keys.no_mtd:
-            if keys.n_mtd > 1:
-                for _ in range(keys.n_mtd):
-                    print(f"\n---MULTI THREADED TESTS ({_+1})---\n")
-                    self.multi_threaded_performance_benchmarks()
+            if keys.n_mtd is not None:
+                if keys.n_mtd > 1:
+                    for _ in range(keys.n_mtd):
+                        print(f"\n---MULTI THREADED TESTS ({_+1})---\n")
+                        self.multi_threaded_performance_benchmarks()
             else:
                 print("\n---MULTI THREADED TESTS---\n")
                 self.multi_threaded_performance_benchmarks()
@@ -121,29 +133,6 @@ class CPUBenchmark:
         return int(operations_count / elapsed_time)
 
     @staticmethod
-    def matrix_multiplication_single_thread(duration_to_run):
-        """As 1 operation is considered two matrices multiplication"""
-        import os
-        import numpy as np
-
-        os.environ['OMP_NUM_THREADS'] = '1'
-
-        a_matrix = np.random.randint(1, 10, size=(pow(10, 2), pow(10, 2)))
-        b_matrix = np.random.randint(1, 10, size=(pow(10, 2), pow(10, 2)))
-        operations_count = 0
-        start = time.time()
-        while time.time() - start < duration_to_run:
-            np.matmul(a_matrix, b_matrix)
-            operations_count += 1
-
-        elapsed_time = round(time.time() - start, 3)
-        print(f"Total operations count (matrices multiplication): {'{:,}'.format(operations_count)}")
-        print(f"Elapsed time: {elapsed_time:.2f} seconds")
-        print(f"Operations per second (matrices multiplication): {'{:,}'.format(int(operations_count / elapsed_time))}\n")
-
-        return int(operations_count / elapsed_time)
-
-    @staticmethod
     def pi_calculation(duration_to_run):
         """"As 1 operation is considered exactly one action (line of code) in the for loop"""
         pi = 3.141592
@@ -165,28 +154,28 @@ class CPUBenchmark:
         return int(operations_count / elapsed_time)
 
     @staticmethod
+    def matrix_multiplication_single_thread(duration_to_run):
+        """As 1 operation is considered two matrices multiplication"""
+        completed_process = subprocess.run(['python3', 'single_thread.py', str(duration_to_run)],
+                                           capture_output=True, text=True)
+        if completed_process.returncode == 0:
+            print(completed_process.stdout[:len(completed_process.stdout) - 3])
+            print(f"The average number of operations per second: {completed_process.stdout[-3:-1]}")
+            return
+        else:
+            pass
+
+    @staticmethod
     def matrix_multiplication_multi_threads(duration_to_run):
-        import os
-        import numpy as np
-
-        number_cores = str(os.cpu_count() // 2)
-        os.environ["OMP_NUM_THREADS"] = number_cores
-
-        a_matrix = np.random.randint(1, 10, size=(pow(10, 2), pow(10, 2)))
-        b_matrix = np.random.randint(1, 10, size=(pow(10, 2), pow(10, 2)))
-        operations_count = 0
-        start = time.time()
-        while time.time() - start < duration_to_run:
-            np.matmul(a_matrix, b_matrix)
-            operations_count += 1
-
-        elapsed_time = round(time.time() - start, 3)
-        print(f"Total operations count (matrices multiplication): {'{:,}'.format(operations_count)}")
-        print(f"Elapsed time: {elapsed_time:.2f} seconds")
-        print(
-            f"Operations per second (matrices multiplication): {'{:,}'.format(int(operations_count / elapsed_time))}\n")
-
-        return int(operations_count / elapsed_time)
+        """As 1 operation is considered two matrices multiplication"""
+        completed_process = subprocess.run(['python3', 'multi_threads.py', str(duration_to_run)],
+                                           capture_output=True, text=True)
+        if completed_process.returncode == 0:
+            print(completed_process.stdout[:len(completed_process.stdout)-3])
+            print(f"The average number of operations per second: {completed_process.stdout[-3:-1]}")
+            return
+        else:
+            pass
 
 
 if __name__ == "__main__":
@@ -207,14 +196,16 @@ Result include score points for selected tests and overall average result.
                                      epilog=textwrap.dedent(epilog))
     parser.add_argument('--no_std', action='store_true',
                         help='Exclude benchmarks aimed at testing single threaded performance')
-    parser.add_argument('--n_std', type=int, help='Number of times to run single threaded tests')
+    parser.add_argument('--n_std', type=int, default=1,
+                        help='Number of times to run single threaded tests')
     parser.add_argument('--t_std', type=int, help='Time for running single threaded benchmarks')
     parser.add_argument('--no_mtd', action='store_true',
                         help='Exclude benchmarks aimed at testing multi threaded performance')
-    parser.add_argument('--n_mtd', type=int, help='Number of times to run single threaded tests')
+    parser.add_argument('--n_mtd', type=int, default=1,
+                        help='Number of times to run single threaded tests')
     parser.add_argument('--t_mtd', type=int, help='Time for running multi threaded benchmarks')
     args = parser.parse_args()
-
+    print(args)
     benchmark = CPUBenchmark()
     benchmark.run_benchmark(args)
 
