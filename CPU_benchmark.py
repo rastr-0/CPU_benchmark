@@ -1,10 +1,6 @@
 #TODO
-"""
-Fix 'multi threaded tests' label (now appears twice)
-Add plots for multi and single threaded tests by specific key
-Add one more algorithm for multi tests
-
-"""
+#Add plots for multi and single threaded tests by specific key
+#Add one more algorithm for multi tests
 
 import argparse
 import textwrap
@@ -31,20 +27,23 @@ class CPUBenchmark:
         result_test2 = self.pi_calculation(duration_to_run=self.std_duration)
         print("\nMatrices multiplication tests are running now!")
         result_test3 = self.matrix_multiplication_single_thread(duration_to_run=self.std_duration)
+        print("\nFibonacci calculation tests are running now!")
+        self.fibonacci_calculation_single_thread()
 
         self.results['single_threaded_performance'] = {
             'factorization_benchmark_test': result_test1,
             'pi_calculation_benchmark_test': result_test2,
             'matrix_multiplication_benchmark_test': result_test3
-
         }
 
     def multi_threaded_performance_benchmarks(self):
-        print("\n---MULTI THREADED TESTS---\n")
         print("Matrices multiplication tests are running now!")
         result_test1 = self.matrix_multiplication_multi_threads(duration_to_run=self.mtd_duration)
+        print("\nFibonacci calculation tests are running now!")
+        self.fibonacci_calculation_multi_threads()
+
         self.results['multi_threaded_performance'] = {
-            'first_benchmark_test': result_test1
+            'matrices_benchmark_test': result_test1
         }
 
     def run_benchmark(self, keys):
@@ -83,13 +82,13 @@ class CPUBenchmark:
   / __\/ _ \/\ /\  | |__   ___ _ __   ___| |__  _ __ ___   __ _ _ __| | __
  / /  / /_)/ / \ \ | '_ \ / _ \ '_ \ / __| '_ \| '_ ` _ \ / _` | '__| |/ /
 / /__/ ___/\ \_/ / | |_) |  __/ | | | (__| | | | | | | | | (_| | |  |   < 
-\____|/     \___/  |_.__/ \___|_| |_|\___|_| |_|_| |_| |_|\__,_|_|  |_|\_\
+\____|/     \___/  |_.__/ \___|_| |_|\___|_| |_|_| |_| |_|\__,_|_|  |_|\_\\
 
- _                           _              ___                           
-| |__  _   _   _ __ __ _ ___| |_ _ __      / _ \                          
-| '_ \| | | | | '__/ _` / __| __| '__|____| | | |                         
-| |_) | |_| | | | | (_| \__ \ |_| | |_____| |_| |                         
-|_.__/ \__, | |_|  \__,_|___/\__|_|        \___/                          
+ _                              _              ___                           
+| |__  _   _      _ __ __ _ ___| |_ _ __      / _ \                          
+| '_ \| | | |    | '__/ _` / __| __| '__|____| | | |                         
+| |_) | |_| |    | | | (_| \__ \ |_| | |_____| |_| |                         
+|_.__/ \__, |    |_|  \__,_|___/\__|_|        \___/                          
        |___/                                                                                                                                                                                                                              
 """)
 
@@ -161,9 +160,18 @@ class CPUBenchmark:
         if completed_process.returncode == 0:
             print(completed_process.stdout[:len(completed_process.stdout) - 3])
             print(f"The average number of operations per second: {completed_process.stdout[-3:-1]}")
-            return
+            lst = completed_process.stdout.split()
+            return int(lst[len(lst)-1])
         else:
-            pass
+            return None
+
+    @staticmethod
+    def fibonacci_calculation_single_thread():
+        amount_of_fi_numbers = 25000
+        completed_process = subprocess.run(['python3', 'fibonacci_numbers_single_thread.py', str(amount_of_fi_numbers)],
+                                           capture_output=True, text=True)
+        if completed_process.returncode == 0:
+            print(completed_process.stdout)
 
     @staticmethod
     def matrix_multiplication_multi_threads(duration_to_run):
@@ -171,11 +179,21 @@ class CPUBenchmark:
         completed_process = subprocess.run(['python3', 'multi_threads.py', str(duration_to_run)],
                                            capture_output=True, text=True)
         if completed_process.returncode == 0:
+            # throw the last 3 elements
             print(completed_process.stdout[:len(completed_process.stdout)-3])
             print(f"The average number of operations per second: {completed_process.stdout[-3:-1]}")
-            return
+            lst = completed_process.stdout.split()
+            return int(lst[len(lst)-1])
         else:
-            pass
+            return None
+
+    @staticmethod
+    def fibonacci_calculation_multi_threads():
+        amount_of_fi_numbers = 25000
+        completed_process = subprocess.run(['python3', 'fibonacci_numbers_multi_threads.py', str(amount_of_fi_numbers)],
+                                           capture_output=True, text=True)
+        if completed_process.returncode == 0:
+            print(completed_process.stdout)
 
 
 if __name__ == "__main__":
@@ -196,17 +214,16 @@ Result include score points for selected tests and overall average result.
                                      epilog=textwrap.dedent(epilog))
     parser.add_argument('--no_std', action='store_true',
                         help='Exclude benchmarks aimed at testing single threaded performance')
-    parser.add_argument('--n_std', type=int, default=1,
+    parser.add_argument('--n_std', type=int,
                         help='Number of times to run single threaded tests')
     parser.add_argument('--t_std', type=int, help='Time for running single threaded benchmarks')
     parser.add_argument('--no_mtd', action='store_true',
                         help='Exclude benchmarks aimed at testing multi threaded performance')
-    parser.add_argument('--n_mtd', type=int, default=1,
+    parser.add_argument('--n_mtd', type=int,
                         help='Number of times to run single threaded tests')
     parser.add_argument('--t_mtd', type=int, help='Time for running multi threaded benchmarks')
     args = parser.parse_args()
-    print(args)
     benchmark = CPUBenchmark()
     benchmark.run_benchmark(args)
 
-    print(f"Time: {benchmark.results}")
+    #print(f"Time: {benchmark.results}")
