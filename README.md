@@ -48,19 +48,22 @@ Here are examples of using CLI:
 * To run only multi-threaded tests 3 times with the default time(15 seconds):
   ```shell
   python3 CPU_benchmark.py --no_std --n_mtd 3
-* To run single-threaded and multi-threaded tests 3 times with the specific time 12 seconds:
+* To run a single-threaded and multi-threaded tests 3 times with the specific time 12 seconds:
   ```shell
   python3 --t_std 12 --n_std 3 --t_mtd 12 --n_mtd 3
 
 ## Benchmarking Algorithms
 * Single-threaded performance: Measures how fast your CPU can perform a specific tests in a single-thread
- * Factorization
- * Pi calculation
- * Matrix multiplication
- * Fibonacci calculation
+ ** Factorization
+ ** Pi calculation
+ ** Matrix multiplication
+ ** Fibonacci calculation
 * Multi-threaded performance: Measures how fast your CPU can perform a specific tests in multi-threadeds
- * Matrix multiplication
- * Fibonacci calculation
+ ** Matrix multiplication
+ ** Fibonacci calculation
 
 ## Contributing
 If you want to contribute to this project, feel free to open issues, submit pull requests, or suggest improvements.
+
+## License
+This project is licensed under the MIT License.
