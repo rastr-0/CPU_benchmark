@@ -54,13 +54,13 @@ Here are examples of using CLI:
 
 ## Benchmarking Algorithms
 * Single-threaded performance: Measures how fast your CPU can perform a specific tests in a single-thread
- ** Factorization
- ** Pi calculation
- ** Matrix multiplication
- ** Fibonacci calculation
+  * Factorization
+  * Pi calculation
+  * Matrix multiplication
+  * Fibonacci calculation
 * Multi-threaded performance: Measures how fast your CPU can perform a specific tests in multi-threadeds
- ** Matrix multiplication
- ** Fibonacci calculation
+  * Matrix multiplication
+  * Fibonacci calculation
 
 ## Contributing
 If you want to contribute to this project, feel free to open issues, submit pull requests, or suggest improvements.
