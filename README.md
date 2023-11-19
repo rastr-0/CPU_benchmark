@@ -62,6 +62,11 @@ Here are examples of using CLI:
   * Matrix multiplication
   * Fibonacci calculation
 
+## Problems to fix
+* No ability to set the execution time of the fibonacci calculation tests
+* The way fibonacci calculation is implemented for multi-threads doesn't look like good. Right now there are 2 separete files for multi/single fibonacci numbers,
+  ideally, these tests should be added to other single and multi tests, respectively.
+
 ## Contributing
 If you want to contribute to this project, feel free to open issues, submit pull requests, or suggest improvements.
 
